@@ -14,6 +14,8 @@ dependencies:
   - $libs.koin.core
   - $libs.voyager.navigator
   - $libs.voyager.koin
+  - $libs.datastore.core
+  - $libs.datastore.preferences.core
 
 dependencies@android:
   - $libs.ktor.client.okhttp

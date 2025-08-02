@@ -1,10 +1,17 @@
 package com.jetbrains.kmpapp.di
 
+import com.jetbrains.kmpapp.data.AuthApi
+import com.jetbrains.kmpapp.data.AuthRepository
+import com.jetbrains.kmpapp.data.AuthStorage
+import com.jetbrains.kmpapp.data.DataStoreAuthStorage
+import com.jetbrains.kmpapp.data.DataStoreFactory
 import com.jetbrains.kmpapp.data.InMemoryMuseumStorage
+import com.jetbrains.kmpapp.data.KtorAuthApi
 import com.jetbrains.kmpapp.data.KtorMuseumApi
 import com.jetbrains.kmpapp.data.MuseumApi
 import com.jetbrains.kmpapp.data.MuseumRepository
 import com.jetbrains.kmpapp.data.MuseumStorage
+import com.jetbrains.kmpapp.screens.auth.AuthScreenModel
 import com.jetbrains.kmpapp.screens.detail.DetailScreenModel
 import com.jetbrains.kmpapp.screens.list.ListScreenModel
 import io.ktor.client.HttpClient
@@ -27,6 +34,7 @@ val dataModule = module {
         }
     }
 
+    // Museum related
     single<MuseumApi> { KtorMuseumApi(get()) }
     single<MuseumStorage> { InMemoryMuseumStorage() }
     single {
@@ -34,16 +42,24 @@ val dataModule = module {
             initialize()
         }
     }
+    
+    // Auth related
+    single<AuthApi> { KtorAuthApi(get()) }
+    single { get<DataStoreFactory>().createDataStore() }
+    single<AuthStorage> { DataStoreAuthStorage(get(), get()) }
+    single { AuthRepository(get(), get()) }
 }
 
 val screenModelsModule = module {
     factoryOf(::ListScreenModel)
     factoryOf(::DetailScreenModel)
+    factoryOf(::AuthScreenModel)
 }
 
 fun initKoin() {
     startKoin {
         modules(
+            platformModule,
             dataModule,
             screenModelsModule,
         )
